@@ -1,16 +1,38 @@
-const { Telegraf, Markup } = require("telegraf");
+const { Telegraf, Scenes, session, Markup } = require("telegraf");
 const fs = require("fs");
+const schedule = require("node-schedule");
 
 const bot = new Telegraf("7138667594:AAHOPSZOKYf0pmy0P-aq8M4vrFcct1Wtk80");
 
 bot.telegram.setMyCommands([
 	{ description: "Start", command: "start" },
-	{ description: "Change time for daily", command: "change" },
+	{ description: "Bot haqida", command: "bot_haqida" },
 ]);
 
-let currentStatus = 0;
-const hour = 12;
-let reminderTime = hour * 60 * 60 * 1000;
+const welcomeText = `
+🤖 *Assalomu alaykum*  
+
+Men – *DailyReminder* botman 📅  
+Sizga har kuni *kunlik rejalarni* eslatib turaman va *g‘oya yoki fikrlaringizni* yozib qo‘yib, keyinchalik qayta ko‘rish imkoniyatini beraman  
+
+📝 Mening yordamim bilan muhim narsalarni unutib qo‘ymaysiz 🚀  
+`;
+
+const aboutBotText = `
+🤖 *Bot haqida*  
+
+Bu bot sizning *shaxsiy yordamchingiz\\!* 📝 Kunlik rejalar va eslatmalarni saqlaydi, o‘z vaqtida eslatadi\\.  
+
+🔹 *Mavjud funksiyalar:*  
+✅ *G'oyalarni yoki idealarni yozish va keyin olish*  
+✅ *Kundalik eslatmalarni saqlash*  
+✅ *Har bir kundalik xabarni aniq soatda eslatish*  
+
+🔜 *Yaqin orada qo‘shiladigan funksiyalar:*  
+🚀 *G'oyalarni va kundalik eslatmalarni tahrirlash*  
+
+🛠 Taklif yoki muammolar bo‘lsa, @S18\\_2003 ga yozing\\! 😊
+`;
 
 const readData = async (path) => {
 	try {
@@ -31,11 +53,62 @@ const writeData = async (path, data) => {
 	}
 };
 
-// Kundalik mayda chuyda ishlarni eslatishi. Bir marta eslatgandan keyin datadan o'chsin
-// Rejalarni yoki idealarni yozib qoyishim va uni soraganimda qaytarishi
+// 🌅 Daily Scene
+const dailyScene = new Scenes.WizardScene(
+	"dailyScene",
+	async (ctx) => {
+		ctx.reply(
+			"📌 Har kuni eslatilishi kerak bo‘lgan xabarni shu yerga yozing."
+		);
+		return ctx.wizard.next();
+	},
+	async (ctx) => {
+		const msg = ctx.message.text;
+		const readingDataDaily = await readData("./daily-data.json");
+		const findMe = readingDataDaily.find((i) => i.id === ctx.from.id);
+		const index = readingDataDaily.findIndex((i) => i.id === ctx.from.id);
 
-// Kundalikni qancha vaqtdan keyin eslatishimni sorasin
+		if (findMe) {
+			findMe.data.push(msg);
+			readingDataDaily[index] = findMe;
+			await writeData("./daily-data.json", readingDataDaily);
+			ctx.reply(
+				"✅ Xabarni saqladim! Endi har kuni ertalab 08:00 da sizga eslatib turaman. ⏰"
+			);
+		}
+		return ctx.scene.leave();
+	}
+);
 
+// 📝 Plans Scene
+const plansScene = new Scenes.WizardScene(
+	"plansScene",
+	async (ctx) => {
+		ctx.reply("📝 Marhamat, yozib qoldiring – men eslab qolaman!");
+		return ctx.wizard.next();
+	},
+	async (ctx) => {
+		const msg = ctx.message.text;
+		const readingDataPlan = await readData("./plan-data.json");
+		const findMe = readingDataPlan.find((i) => i.id === ctx.from.id);
+		const index = readingDataPlan.findIndex((i) => i.id === ctx.from.id);
+
+		if (findMe) {
+			findMe.data.push(msg);
+			readingDataPlan[index] = findMe;
+			await writeData("./plan-data.json", readingDataPlan);
+			ctx.reply("🎉 Ajoyib! Xabaringizni muvaffaqiyatli saqladim. ✅");
+		}
+		return ctx.scene.leave();
+	}
+);
+
+// Sahna va session middleware qo'shish
+const stage = new Scenes.Stage([dailyScene, plansScene]);
+bot.use(session());
+bot.use(stage.middleware());
+
+// Start Command
 bot.command("start", async (ctx) => {
 	const readingDataDaily = await readData("./daily-data.json");
 	const readingDataPlan = await readData("./plan-data.json");
@@ -53,90 +126,64 @@ bot.command("start", async (ctx) => {
 	}
 
 	ctx.reply(
-		`Assalomu alaykum ${ctx.from.first_name}. Qayerni gullatamiz bugun. Menga ish bormi?`,
+		welcomeText,
 		Markup.keyboard([
-			["🌅 Daily"],
-			["📝 Plans or Ideas"],
-			["📜 Give me my plans"],
+			["🌅 Kunlik"],
+			["📝 G'oya yoki fikrlar"],
+			["📜 G'oya va fikrlarni ko'rish"],
 		]).resize()
 	);
-	currentStatus = 0;
 });
 
-bot.command("change", (ctx) => {
-	currentStatus = 4;
-
-	ctx.reply("Necha soatdan keyin eslatay hay?");
+bot.command("bot_haqida", (ctx) => {
+	ctx.replyWithMarkdownV2(aboutBotText);
 });
 
-bot.on("message", async (ctx) => {
-	const msg = ctx.message.text;
-	const readingDataDaily = await readData("./daily-data.json");
+bot.hears("🌅 Kunlik", (ctx) => ctx.scene.enter("dailyScene"));
+bot.hears("📝 G'oya yoki fikrlar", (ctx) => ctx.scene.enter("plansScene"));
+
+// 📜 G'oyalarni ko‘rsatish
+bot.hears("📜 G'oya va fikrlarni ko'rish", async (ctx) => {
 	const readingDataPlan = await readData("./plan-data.json");
+	const findMe = readingDataPlan.find((i) => i.id === ctx.from.id);
 
-	if (currentStatus === 0) {
-		if (msg === "🌅 Daily") {
-			ctx.reply("Marhamat yozing togo. Nimani eslatishim kerak?");
-			currentStatus = 1;
-		} else if (msg === "📝 Plans or Ideas") {
-			currentStatus = 2;
-			ctx.reply(
-				"Jiddiy ishmi? Qanaqa plan bor. Yoki idea keb qoldimi miyachaga"
-			);
-		} else if (msg === "📜 Give me my plans") {
-			const findMe = readingDataPlan.find((i) => i.id === ctx.from.id);
-
-			if (findMe?.data.length > 0) {
-				const text = `📝 ${findMe.data.join("\n\n")}`;
-				ctx.reply(`📌 Your plans or ideas:\n\n${text}`);
-			}
-		}
-	} else if (currentStatus === 1) {
-		const findMe = readingDataDaily.find((i) => i.id === ctx.from.id);
-		const index = readingDataDaily.findIndex((i) => i.id === ctx.from.id);
-
-		if (findMe) {
-			const data = findMe.data;
-
-			readingDataDaily[index] = { id: findMe.id, data: [...data, msg] };
-			await writeData("./daily-data.json", readingDataDaily);
-
-			ctx.reply("Boldi tm eslab qoldim bro ✌🏻");
-
-			if (findMe?.data.length > 0) {
-				const text = `📝 ${findMe.data.join("\n\n")}`;
-				setTimeout(() => {
-					bot.telegram.sendMessage(
-						ctx.from.id,
-						`📌 Your daily routine:\n\n${text}`
-					);
-					writeData("./daily-data.json", []);
-				}, reminderTime);
-			}
-			currentStatus = 0;
-		}
-	} else if (currentStatus === 2) {
-		const findMe = readingDataPlan.find((i) => i.id === ctx.from.id);
-		const index = readingDataPlan.findIndex((i) => i.id === ctx.from.id);
-
-		if (findMe) {
-			const data = findMe.data;
-
-			readingDataPlan[index] = { id: findMe.id, data: [...data, msg] };
-			await writeData("./plan-data.json", readingDataPlan);
-
-			ctx.reply("Planni qichchuviku 😁. Saqlab qoydim ✅");
-			currentStatus = 0;
-		}
-	} else if (currentStatus === 4) {
-		if (!isNaN(+msg)) {
-			hour = +msg;
-		} else {
-			console.log("Bu number emas!");
-		}
-		currentStatus = 0;
+	if (findMe?.data.length > 0) {
+		const text = `📌 G'oyalar va fikrlar:\n\n${findMe.data
+			.map((item, index) => `${index + 1}. ${item}`)
+			.join("\n\n")}`;
+		ctx.reply(text);
+	} else {
+		ctx.reply(
+			"💡 Sizda hozircha hech qanday g‘oya yoki fikr yo‘q! Yangi fikr kelganida bemalol yozib qo‘ying – men uni saqlab qo‘yaman! 😉"
+		);
 	}
-	console.log(currentStatus);
+});
+
+schedule.scheduleJob("0 8 * * *", async () => {
+	const readingDataDaily = await readData("./daily-data.json");
+
+	for (const user of readingDataDaily) {
+		if (user.data.length > 0) {
+			const text = `📌 Sizning kundalik eslatmalaringiz:\n\n${user.data
+				.map((item, index) => `${index + 1}. ${item}`)
+				.join("\n\n")}`;
+			bot.telegram.sendMessage(user.id, text).catch((err) => {
+				console.log(`Failed to send message to ${user.id}:`, err.message);
+			});
+		}
+	}
+
+	console.log("📢 Daily reminders sent at 08:00 AM");
 });
 
 bot.launch();
+
+// Rejalarni yoki idealarni yozib qoyishim va uni soraganimda qaytarishi = 1
+
+// Kundalikni har kuni qaysi vaqtda eslatishini o'rnatish kerak = 1
+
+// Har bir kundalik xabar har kuni nechchida eslatilishini belgilash mumkin bo'lsin
+
+// Rejani ham kundalikni ham edit qilish mumkin bo'lsin
+
+// zanjir uchun kutubxona qidirish = 1
