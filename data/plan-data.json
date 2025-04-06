@@ -1,16 +1,22 @@
 [
-  {
-    "id": 311574536,
-    "data": [
-      "asassas",
-      "LISA",
-      "bruno mars"
-    ]
-  },
-  {
-    "id": 7848280917,
-    "data": [
-      "Salom bu test"
-    ]
-  }
+	{
+		"id": 311574536,
+		"data": [
+			"Botni takomillashtirish",
+			"Salom",
+			"Hotamtoy yaxshi nom \nQaysidur dasturni nomlashga",
+			"Stand up hazil yozish kanalga\nYaxshi oylangan fikr mulohazali",
+			"Blokchain ga asoslangan pul yigadigan fond yasash. Albatta bunda qaysidur tolov tizimi va bank bilan integrstsiya boladi. \n\nAfzalliklari tushgan pul shaffof hammaga korinib turadi. Yonaltirilgan joyi ham hammaga korinadi. \n\nQollanilishiga misol: Bir mahalladagilar, kursdoshlar yoki qaysidur ijtimoiy guruh pul yigʻishda foydalanadi.",
+			"He-he_chat",
+			"Crypyo \nKapitalizm \nChatdan sorash",
+			"React native darsliklar ketma ketligi tuzish",
+			"📝 G'oya yoki fikrlar",
+			"food order loyihani aws serverga yuklab ishlatib qoyish\nva shu bahona aws time zone ni ham togirlab qoyish",
+			"1. Upworkda shoshilmasdan hamma elonni korib chiq\n\n2. Sherzod akaga telefon qil\n\n3. Food orderni togirla va Baxtga tel qilib kor"
+		]
+	},
+	{
+		"id": 5252931517,
+		"data": ["Test fikr", "Test fikr 2", "📜 G'oya va fikrlarni ko'rish"]
+	}
 ]

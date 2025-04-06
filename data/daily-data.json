@@ -1,19 +1,19 @@
 [
-  {
-    "id": 311574536,
-    "data": [
-      "Tish yuvish kerak",
-      "dars qilish",
-      "salom",
-      "asasas"
-    ],
-    "time": "14"
-  },
-  {
-    "id": 7848280917,
-    "data": [
-      "Test eslatma"
-    ],
-    "time": "8"
-  }
+	{
+		"id": 311574536,
+		"data": [
+			"Tish yuvish kerak",
+			"UPWORK VA ZEDGE akkountlarni kirib tekshirib turish",
+			"Promise closures va class mavzulariga chatgptda topshiriq",
+			"\"experiments\": {\n      \"typedRoutes\": true,\n      \"tsconfigPaths\": true\n    }\n\nchatdan so'rashim kerak",
+			"React native uchun amaliyot qilgani hamma imkoniyatlarini ochib beradigan loyiha oylab topish",
+			"Ingliz tilida kino korish"
+		],
+		"time": "8"
+	},
+	{
+		"id": 5252931517,
+		"data": ["Test message", "📝 G'oya yoki fikrlar"],
+		"time": "8"
+	}
 ]
