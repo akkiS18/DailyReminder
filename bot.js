@@ -9,7 +9,7 @@ const { showScene } = require("./scenes/showScene");
 const { settingScene } = require("./scenes/settingScene");
 const { sendDailyReminders } = require("./services/scheduler");
 
-const bot = new Telegraf("6684407456:AAHJDFWwJOICM62l1nJC-9ZOOOz55DfMMqk"); //7138667594:AAHOPSZOKYf0pmy0P-aq8M4vrFcct1Wtk80
+const bot = new Telegraf("7138667594:AAHOPSZOKYf0pmy0P-aq8M4vrFcct1Wtk80");
 
 // Sahna va session middleware qo'shish
 const stage = new Scenes.Stage([
