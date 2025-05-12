@@ -24,7 +24,7 @@
 ## 🚀 O‘rnatish (Local Development uchun)
 
 ```bash
-git clone https://github.com/your-username/DailyReminder.git
+git clone https://github.com/akki18/DailyReminder.git
 cd DailyReminder
 npm install
 ```
