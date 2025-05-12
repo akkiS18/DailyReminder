@@ -33,4 +33,4 @@ npm install
 
 Agar sizda savollar, takliflar yoki hamkorlik istagi bo‘lsa, quyidagi manzilga yozing:
 
-📧 sultonkalonov@icloud.com 📱 Telegram: @S18_2003
+📧 sulton.kalonov@icloud.com 📱 Telegram: @S18_2003
